@@ -54,8 +54,12 @@ trait HasRelationships
      */
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
-        $instance = $this->newRelatedInstance($related);
+        $relationName = Str::snake(class_basename($related));
 
+        $instance = $this->relationLoaded($relationName)
+            ? $this->getRelation($relationName)
+            : $this->newRelatedInstance($related);
+    
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $localKey = $localKey ?: $this->getKeyName();
