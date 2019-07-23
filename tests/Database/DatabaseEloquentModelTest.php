@@ -837,6 +837,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals([1, 2, 3], $array['list_items']);
     }
 
+    public function testToArrayUsesMutatorsCasting()
+    {
+        $model = new EloquentModelAppendsWithCastingStub;
+
+        $array = $model->toArray();
+
+        $this->assertEquals(1, $array['is_admin']);
+    }
+
     public function testHidden()
     {
         $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
@@ -2351,4 +2360,17 @@ class EloquentModelWithUpdatedAtNull extends Model
 {
     protected $table = 'stub';
     const UPDATED_AT = null;
+}
+
+class EloquentModelAppendsWithCastingStub extends Model
+{
+    protected $casts = [
+        'is_admin' => 'int',
+    ];
+    protected $appends = ['is_admin'];
+
+    public function getIsAdminAttribute()
+    {
+        return true;
+    }
 }

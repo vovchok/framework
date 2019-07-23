@@ -97,13 +97,6 @@ trait HasAttributes
             $attributes, $mutatedAttributes = $this->getMutatedAttributes()
         );
 
-        // Next we will handle any casts that have been setup for this model and cast
-        // the values to their appropriate type. If the attribute has a mutator we
-        // will not perform the cast on those attributes to avoid any confusion.
-        $attributes = $this->addCastAttributesToArray(
-            $attributes, $mutatedAttributes
-        );
-
         // Here we will grab all of the appended, calculated attributes to this model
         // as these attributes are not really in the attributes array, but are run
         // when we need to array or JSON the model for convenience to the coder.
@@ -111,7 +104,9 @@ trait HasAttributes
             $attributes[$key] = $this->mutateAttributeForArray($key, null);
         }
 
-        return $attributes;
+        // Next we will handle any casts that have been setup for this model and cast
+        // the values to their appropriate type.
+        return $this->addCastAttributesToArray($attributes);
     }
 
     /**
@@ -167,13 +162,12 @@ trait HasAttributes
      * Add the casted attributes to the attributes array.
      *
      * @param  array  $attributes
-     * @param  array  $mutatedAttributes
      * @return array
      */
-    protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
+    protected function addCastAttributesToArray(array $attributes)
     {
         foreach ($this->getCasts() as $key => $value) {
-            if (! array_key_exists($key, $attributes) || in_array($key, $mutatedAttributes)) {
+            if (! array_key_exists($key, $attributes)) {
                 continue;
             }
 
